@@ -82,9 +82,23 @@ PIPER_HOST=192.168.100.112 PIPER_PORT=10200 python tts_http.py
 |---|---|---|
 | `PIPER_HOST` | `192.168.100.112` | Piper Wyoming server host |
 | `PIPER_PORT` | `10200` | Piper Wyoming server port |
-| `VOICE` | `""` | Default voice (e.g. `vi_VN-vais1000-medium`) |
+| `VOICE` | `""` | Default voice (e.g. `maiphuong`) |
+| `VOICE_LANGUAGES` | `""` | Filter `/voices` by language, comma-separated (e.g. `vi,vi_VN`). Empty = list all. Prefix match — `vi` also matches `vi_VN`. |
 | `API_HOST` | `0.0.0.0` | Bind address for this bridge |
 | `API_PORT` | `5002` | Port for this bridge |
+
+### Filtering voices by language
+
+`GET /voices` returns every installed voice by default (44+ languages). To
+surface only a language family, set `VOICE_LANGUAGES`:
+
+```bash
+docker run ... -e VOICE_LANGUAGES="vi,vi_VN" ...
+# GET /voices → only voices whose language starts with "vi" or "vi_VN"
+```
+
+The filter is a case-insensitive prefix match, so `vi` alone already covers all
+`vi_VN` voices (this repo's voices use both `vi` and `vi_VN` tags).
 
 ## Voice list (Vietnamese)
 

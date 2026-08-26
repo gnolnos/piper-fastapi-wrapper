@@ -36,6 +36,14 @@ PIPER_PORT = int(os.getenv("PIPER_PORT", "10200"))
 VOICE = os.environ.get("VOICE", "")
 API_HOST = os.getenv("API_HOST", "0.0.0.0")
 API_PORT = int(os.getenv("API_PORT", "5002"))
+# Lọc danh sách voice theo ngôn ngữ. Bỏ trống (mặc định) = hiện tất cả.
+# Ví dụ: VOICE_LANGUAGES="vi,vi_VN" → chỉ giữ voice có language bắt đầu bằng vi/vi_VN.
+# Khớp theo tiền tố: "vi" sẽ khớp cả "vi" và "vi_VN".
+VOICE_LANGUAGES = [
+    p.strip().lower()
+    for p in os.environ.get("VOICE_LANGUAGES", "").split(",")
+    if p.strip()
+]
 
 app = FastAPI(
     title="Piper FastAPI Wrapper",
@@ -91,6 +99,15 @@ async def list_voices():
             if not prog.installed:
                 continue
             for v in (prog.voices or []):
+                # Lọc theo VOICE_LANGUAGES (khớp tiền tố, case-insensitive)
+                if VOICE_LANGUAGES:
+                    langs = [l.lower() for l in (v.languages or [])]
+                    if not any(
+                        lang.startswith(prefix) or lang == prefix
+                        for lang in langs
+                        for prefix in VOICE_LANGUAGES
+                    ):
+                        continue
                 voices.append({
                     "name": v.name,
                     "description": v.description,
