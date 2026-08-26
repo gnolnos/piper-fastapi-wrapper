@@ -1,0 +1,26 @@
+# ============================================================
+#  Piper FastAPI Wrapper — "MIỆNG" (TTS bridge)
+#  HTTP API quanh Piper (Wyoming TCP). Nối tới Piper :10200.
+# ============================================================
+#  Chạy:
+#    docker compose up -d --build
+#  Test:
+#    curl http://localhost:5002/health
+#    curl -X POST http://localhost:5002/tts \
+#      -H "Content-Type: application/json" \
+#      -d '{"text":"xin chào bạn","voice":"vi_VN-vais1000-medium"}' \
+#      --output hello.wav
+#    curl http://localhost:5002/voices
+
+services:
+  piper-tts-bridge:
+    build: .
+    image: piper-fastapi-wrapper:local
+    container_name: piper-tts-bridge
+    ports:
+      - "5002:5002"
+    environment:
+      PIPER_HOST: "192.168.100.112"    # host chạy Piper (Wyoming)
+      PIPER_PORT: "10200"
+      VOICE: "vi_VN-vais1000-medium"   # voice mặc định (bỏ trống để dùng mặc định Piper)
+    restart: unless-stopped
